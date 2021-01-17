@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name Arduino)(type KiCad)(uri ${KIPRJMOD}/../arduino-kicad-library/Arduino.pretty)(options "")(descr ""))
+  (lib (name pcmcia)(type KiCad)(uri ${KIPRJMOD}/../pcmcia.pretty)(options "")(descr ""))
+)
