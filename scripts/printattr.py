@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import struct
+import itertools
 
 def CISTPL_DEVICE(t):
     ret = "CISTPL_DEVICE " + str(t) + "\n"
@@ -104,11 +105,28 @@ def CISTPL_MANFID(t):
     ret += " MANF: " + hex(manf) + " CARD: " + hex(card) +"\n"
     return ret
 
+
+def CISTPL_VERS_1(t):
+    ret = "CISTPL_VERS_1 " + str(t) + "\n"
+    ret += " MAJOR: " + str(t[2]) + " MINOR: " + str(t[3]) + "\n"
+    i = iter(t[4:])
+    for info in ("PRODUCT: ", "NAME: ", "ADD1: ", "ADD2: "):
+        st=next(i)
+        if st == 0xff:
+            return ret
+        if st == 0:
+            string = ""
+        else:
+            string=chr(st) + bytes(itertools.takewhile(int(0).__ne__,i)).decode("ascii")
+        ret+=" " + info + string + "\n"
+    return ret
+
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
         0x1C : lambda t: CISTPL_DEVICE_OC(t),
         0x18 : lambda t: CISTPL_JEDEC_C(t),
         0x20 : lambda t: CISTPL_MANFID(t),
+        0x15 : lambda t: CISTPL_VERS_1(t),
         }
 
 def pprinter(t):
