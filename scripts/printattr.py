@@ -77,9 +77,23 @@ def DEVICE_INFO(t):
         i+=off+1
     return ret
 
+def CISTPL_DEVICE_OC(t):
+    ret = "CISTPL_DEVICE_OC " + str(t) + "\n"
+    i=2
+    VCC_DICT = { 0: "5V", 1:"3.3V",2: "X.XV", 3:"Y.YV"}
+
+    while True:
+        ret+=" VCC " + VCC_DICT[(t[i]>>1)&0x3] + (" MWAIT" if t[i]&0x01 else " NOMWAIT") + "\n"
+        i+=1
+        if not t[i-1]&0x80:
+            break
+    ret+=DEVICE_INFO(t[i:])
+    return ret
+
 
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
+        0x1C : lambda t: CISTPL_DEVICE_OC(t),
         }
 
 def pprinter(t):
