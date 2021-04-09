@@ -90,10 +90,18 @@ def CISTPL_DEVICE_OC(t):
     ret+=DEVICE_INFO(t[i:])
     return ret
 
+def CISTPL_JEDEC_C(t):
+    ret = "CISTPL_DEVICE_JEDEC_C " + str(t) + "\n"
+    i=2
+    for mfg,cid in zip(t[i::2], t[i+1::2]):
+        ret+=" MFG: " + hex(mfg) + " ID: " + hex(cid) + "\n"
+    return ret
+
 
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
         0x1C : lambda t: CISTPL_DEVICE_OC(t),
+        0x18 : lambda t: CISTPL_JEDEC_C(t),
         }
 
 def pprinter(t):
