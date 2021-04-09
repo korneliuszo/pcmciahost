@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import struct
 
 def CISTPL_DEVICE(t):
     ret = "CISTPL_DEVICE " + str(t) + "\n"
@@ -97,11 +98,17 @@ def CISTPL_JEDEC_C(t):
         ret+=" MFG: " + hex(mfg) + " ID: " + hex(cid) + "\n"
     return ret
 
+def CISTPL_MANFID(t):
+    ret = "CISTPL_MANFID " + str(t) + "\n"
+    manf,card = struct.unpack("<HH",bytes(t[2:]))
+    ret += " MANF: " + hex(manf) + " CARD: " + hex(card) +"\n"
+    return ret
 
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
         0x1C : lambda t: CISTPL_DEVICE_OC(t),
         0x18 : lambda t: CISTPL_JEDEC_C(t),
+        0x20 : lambda t: CISTPL_MANFID(t),
         }
 
 def pprinter(t):
