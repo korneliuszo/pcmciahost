@@ -3,6 +3,12 @@
 def CISTPL_DEVICE(t):
     ret = "CISTPL_DEVICE " + str(t) + "\n"
     i=2
+    ret += DEVICE_INFO(t[i:])
+    return ret
+
+def DEVICE_INFO(t):
+    ret = ""
+    i = 0
     while t[i] != 0xff:
         device_type = {
                 0 : "DTYPE_NULL",
