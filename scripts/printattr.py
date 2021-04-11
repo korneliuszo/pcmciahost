@@ -143,6 +143,21 @@ def CISTPL_FUNCID(t):
     ret += " " + ("ROM" if t[3]&0x02 else "NOROM") + " " + ("POST" if t[3]&0x01 else "NOPOST") + "\n"
     return ret
 
+def CISTPL_FUNCE(t):
+    def FUNCE_ATA(t):
+        ret = " FUNCE_ATA\n"
+        return ret
+
+    ret = "CISTPL_FUNCE " + str(t) + "\n"
+    knownfunc = {
+            0x01 : FUNCE_ATA,
+        }
+    if t[2] in knownfunc.keys():
+        return ret + knownfunc[t[2]](t)
+    else:
+        return ret + " UNKNOWN"
+
+
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
         0x1C : lambda t: CISTPL_DEVICE_OC(t),
@@ -150,6 +165,7 @@ knownid = {
         0x20 : lambda t: CISTPL_MANFID(t),
         0x15 : lambda t: CISTPL_VERS_1(t),
         0x21 : lambda t: CISTPL_FUNCID(t),
+        0x22 : lambda t: CISTPL_FUNCE(t),
         }
 
 def pprinter(t):
