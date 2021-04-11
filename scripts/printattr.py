@@ -159,13 +159,13 @@ def CISTPL_FUNCE(t):
 
 
 knownid = {
-        0x01 : lambda t: CISTPL_DEVICE(t),
-        0x1C : lambda t: CISTPL_DEVICE_OC(t),
-        0x18 : lambda t: CISTPL_JEDEC_C(t),
-        0x20 : lambda t: CISTPL_MANFID(t),
-        0x15 : lambda t: CISTPL_VERS_1(t),
-        0x21 : lambda t: CISTPL_FUNCID(t),
-        0x22 : lambda t: CISTPL_FUNCE(t),
+        0x01 : CISTPL_DEVICE,
+        0x1C : CISTPL_DEVICE_OC,
+        0x18 : CISTPL_JEDEC_C,
+        0x20 : CISTPL_MANFID,
+        0x15 : CISTPL_VERS_1,
+        0x21 : CISTPL_FUNCID,
+        0x22 : CISTPL_FUNCE,
         }
 
 def pprinter(t):
