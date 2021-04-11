@@ -121,12 +121,35 @@ def CISTPL_VERS_1(t):
         ret+=" " + info + string + "\n"
     return ret
 
+def CISTPL_FUNCID(t):
+    ret = "CISTPL_FUNCID " + str(t) + "\n"
+    functiondict = {
+            0x00: "Multi-Function",
+            0x01: "Memory",
+            0x02: "Serial Port",
+            0x03: "Parallel Port",
+            0x04: "Fixed Disk",
+            0x05: "Video Adapter",
+            0x06: "Network Adapter",
+            0x07: "AIMS",
+            0x08: "SCSI",
+            0x09: "Security",
+            0x0A: "Instrument",
+            0x0B: "Serial I/O Bus Adapter",
+            0xFE: "Vendor-Specific",
+            0xFF: "Do Not Use",
+        }
+    ret += " FUNCTION: " + functiondict[t[2]] + "\n"
+    ret += " " + ("ROM" if t[3]&0x02 else "NOROM") + " " + ("POST" if t[3]&0x01 else "NOPOST") + "\n"
+    return ret
+
 knownid = {
         0x01 : lambda t: CISTPL_DEVICE(t),
         0x1C : lambda t: CISTPL_DEVICE_OC(t),
         0x18 : lambda t: CISTPL_JEDEC_C(t),
         0x20 : lambda t: CISTPL_MANFID(t),
         0x15 : lambda t: CISTPL_VERS_1(t),
+        0x21 : lambda t: CISTPL_FUNCID(t),
         }
 
 def pprinter(t):
