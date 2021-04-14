@@ -191,6 +191,199 @@ def CISTPL_CONFIG(t):
     ret += " TPC_RMSK: " + hex(TPC_RMSK) + "\n"
     return ret
 
+def CISTPL_CFTABLE_ENTRY(t):
+    ret = "CISTPL_CFTABLE_ENTRY " + str(t) + "\n"
+    ret += " CONF_ENTRY_NUMBER: " + str(t[2]&0x3f) + (" (DEFAULT)\n" if t[2]&0x40 else "\n")
+    reg = 3
+    if t[2]&0x80:
+        ift = {
+                0 : "Memory",
+                1 : "IO and Memory",
+                4 : "Custom interface 0",
+                5 : "Custom interface 1",
+                6 : "Custom interface 2",
+                7 : "Custom interface 3",
+            }
+        ret += " " + ift[t[reg]&0x0f] + "\n"
+        ret += " " + "BVDs Active=" + str(bool(t[reg]&0x10)) + "\n"
+        ret += " " + "WP Active=" + str(bool(t[reg]&0x20)) + "\n"
+        ret += " " + "READY Active=" + str(bool(t[reg]&0x40)) + "\n"
+        ret += " " + "M Wait Active=" + str(bool(t[reg]&0x80)) + "\n"
+        reg+=1
+
+    TPCE_FS = t[reg]
+    reg+=1
+    pd_dict = {
+            0 : [],
+            1 : ["Vcc"],
+            2 : ["Vcc","Vpp"],
+            3 : ["Vcc","Vpp1","Vpp2"],
+        }
+    for pd in pd_dict[TPCE_FS&0x03>>0]:
+        TPCE_PD = t[reg]
+        reg+=1
+        ret += " " + pd + "\n"
+        def to_int(t,reg, exps):
+            mantisa = {
+                    0 : 1.0,
+                    1 : 1.2,
+                    2 : 1.3,
+                    3 : 1.5,
+                    4 : 2.0,
+                    5 : 2.5,
+                    6 : 3.0,
+                    7 : 3.5,
+                    8 : 4.0,
+                    9 : 4.5,
+                    10 : 5.0,
+                    11 : 5.5,
+                    12 : 6.0,
+                    13 : 7.0,
+                    14 : 8.0,
+                    15 : 9.0,
+                }
+            PD1 = t[reg]
+            reg+=1
+            val = mantisa[(PD1&0x78)>>3]
+            ext = 0.01
+            exps *= 10**((PD1&0x7)-7)
+            PDX = PD1
+            while PDX & 0x80:
+                PDX = t[reg]
+                reg+=1
+                if (PDX&0x7F) == 0x7D:
+                    return reg, str(val*exps)+"NC"
+                if (PDX&0x7F) == 0x7E:
+                    return reg, "ZERO"
+                if (PDX&0x7F) == 0x7F:
+                    return reg, "NC REQ"
+                if (PDX&0x7F) < 100:
+                    val += (PDX&0x7f)*ext
+                    ext /= 100
+            return str(val*exps),reg
+        if TPCE_PD & 0x01:
+            val,reg = to_int(t,reg,100)
+            ret += "  Norm V: " + val + "V\n"
+        if TPCE_PD & 0x02:
+            val,reg = to_int(t,reg,100)
+            ret += "  Min V: " + val + "V\n"
+        if TPCE_PD & 0x04:
+            val,reg = to_int(t,reg,100)
+            ret += "  Max V: " + val + "V\n"
+        if TPCE_PD & 0x08:
+            val,reg = to_int(t,reg,1)
+            ret += "  Static I: " + val + "A\n"
+        if TPCE_PD & 0x10:
+            val,reg = to_int(t,reg,1)
+            ret += "  Avg I: " + val + "A\n"
+        if TPCE_PD & 0x20:
+            val,reg = to_int(t,reg,1)
+            ret += "  Peak I: " + val + "A\n"
+        if TPCE_PD & 0x40:
+            val,reg = to_int(t,reg,1)
+            ret += "  PDwn I: " + val + "A\n"
+    if TPCE_FS & 0x04:
+        TPCE_TD = t[reg]
+        reg+=1
+        ret += " WAIT Scale: " + str(TPCE_TD&0x03>>0) + "\n"
+        ret += " READY Scale: " + str(TPCE_TD&0x1C>>2) + "\n"
+    if TPCE_FS & 0x08:
+        TPCE_IO = t[reg]
+        reg+=1
+        bust = {
+                1 : "8bit only",
+                2 : "16bit only",
+                3 : "8/16bit",
+                }
+        ret += " " + bust[(TPCE_IO&0x60)>>5] + "\n"
+        ret += " IOAddrLines: " + str(TPCE_IO&0x1F) + "\n"
+        if TPCE_IO & 0x80:
+            IO_RANGE = t[reg]
+            reg+=1
+            for i in range((IO_RANGE&0x0f)+1):
+                ret += " Range: " + str(i) + "\n"
+                addr = 0
+                for n in range((IO_RANGE&0x20)>>4):
+                    addr |= t[reg] << (n*8)
+                    reg+=1
+                ret += "  Address: " + hex(addr) + "\n"
+                length = 0
+                for n in range((IO_RANGE&0xC0)>>6):
+                    length |= t[reg] << (n*8)
+                    reg+=1
+                ret += "  Length: " + hex(length+1) + "\n"
+    if TPCE_FS & 0x10:
+        TPCE_IRQ = t[reg]
+        reg+=1
+        ret += " IRQ Share=" +str(bool(TPCE_IRQ&0x80)) + "\n"
+        ret += " IRQ Pulse=" +str(bool(TPCE_IRQ&0x40)) + "\n"
+        ret += " IRQ Level=" +str(bool(TPCE_IRQ&0x20)) + "\n"
+        if not TPCE_IRQ&0x10:
+            ret += " IRQ Line=" +str(TPCE_IRQ&0x0F) + "\n"
+        else:
+            ret += " IRQ VEND=" +str(bool(TPCE_IRQ&0x08)) + "\n"
+            ret += " IRQ BERR=" +str(bool(TPCE_IRQ&0x04)) + "\n"
+            ret += " IRQ IOCK=" +str(bool(TPCE_IRQ&0x02)) + "\n"
+            ret += " IRQ NMI=" +str(bool(TPCE_IRQ&0x01)) + "\n"
+            mask = t[reg] | (t[reg+1]<<8)
+            reg+=2
+            ret += " IRQ Mask=" + hex(mask) + "\n"
+    if (TPCE_FS & 0x60)>>5 == 0:
+        pass
+    if (TPCE_FS & 0x60)>>5 == 1:
+        length = (t[reg] | (t[reg+1]<<8))*256
+        reg+=2
+        ret += " Memory Length: " + str(length) + "\n"
+    if (TPCE_FS & 0x60)>>5 == 2:
+        length = (t[reg] | (t[reg+1]<<8))*256
+        addr = (t[reg+2] | (t[reg+3]<<8))*256
+        reg+=4
+        ret += " Memory Address: " + hex(addr) + "\n"
+        ret += " Memory Length: " + str(length) + "\n"
+    if (TPCE_FS & 0x60)>>5 == 3:
+        TPCE_MS = t[reg]
+        reg+=1
+        for i in range((TPCE_MS&0x07)+1):
+            ret += " Range: " + str(i) + "\n"
+            length = 0
+            for n in range((TPCE_MS&0x18)>>3):
+                length |= t[reg] << (n*8)
+                reg+=1
+            ret += "  Length: " + hex(length*256) + "\n"
+            addr = 0
+            for n in range((TPCE_MS&0x60)>>5):
+                addr |= t[reg] << (n*8)
+                reg+=1
+            ret += "  Address: " + hex(addr*256) + "\n"
+            if TPCE_MS&0x80:
+                haddr = 0
+                for n in range((TPCE_MS&0x60)>>5):
+                    haddr |= t[reg] << (n*8)
+                    reg+=1
+                ret += "  Host Address: " + hex(addr*256) + "\n"
+    if TPCE_FS & 0x80:
+        TPCE_MI = t[reg]
+        reg+=1
+        ret += " Max Twin Cards: " + str(TPCE_MI&0x7) + "\n"
+        ret += " Audio: " + str(bool(TPCE_MI&0x8)) + "\n"
+        ret += " Read only: " + str(bool(TPCE_MI&0x10)) + "\n"
+        ret += " Pwr Down: " + str(bool(TPCE_MI&0x20)) + "\n"
+        if TPCE_MI&0x80:
+            TPCE_MI2 = t[reg]
+            reg+=1
+            dmadict = {
+                    0 : "None",
+                    1 : "SPKR",
+                    2 : "IOIS16",
+                    3 : "INPACK",
+                }
+            ret += " Dma: " + dmadict[(TPCE_MI2&0x0C)>>2] + "\n"
+            ret += " Dma: " + ("16bit" if (TPCE_MI2&0x10) else "8bit") + "\n"
+            if TPCE_MI2&0x80:
+                ret += " TH: " + str(t[reg]) + "." + str(t[reg+1]) + "\n"
+                reg+=2
+    return ret
+
 knownid = {
         0x01 : CISTPL_DEVICE,
         0x1C : CISTPL_DEVICE_OC,
@@ -200,6 +393,7 @@ knownid = {
         0x21 : CISTPL_FUNCID,
         0x22 : CISTPL_FUNCE,
         0x1A : CISTPL_CONFIG,
+        0x1B : CISTPL_CFTABLE_ENTRY,
         }
 
 def pprinter(t):
