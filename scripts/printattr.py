@@ -384,6 +384,10 @@ def CISTPL_CFTABLE_ENTRY(t):
                 reg+=2
     return ret
 
+def CISTPL_NO_LINK(t):
+    ret = "CISTPL_NO_LINK "  + str(t) + "\n"
+    return ret
+
 knownid = {
         0x01 : CISTPL_DEVICE,
         0x1C : CISTPL_DEVICE_OC,
@@ -394,6 +398,7 @@ knownid = {
         0x22 : CISTPL_FUNCE,
         0x1A : CISTPL_CONFIG,
         0x1B : CISTPL_CFTABLE_ENTRY,
+        0x14 : CISTPL_NO_LINK,
         }
 
 def pprinter(t):
