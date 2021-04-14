@@ -172,6 +172,24 @@ def CISTPL_FUNCE(t):
     else:
         return ret + " UNKNOWN"
 
+def CISTPL_CONFIG(t):
+    ret = "CISTPL_CONFIG " + str(t) + "\n"
+    tpcc_rmsz = ((t[2] & 0x3C)>>2) + 1
+    tpcc_rasz = ((t[2] & 0x03)>>0) + 1
+    ret += " TPCC_LAST: " + str(t[3]) + "\n"
+    n=0
+    TPC_RADR = 0
+    for val in t[4:4+tpcc_rasz]:
+        TPC_RADR |= val << n
+        n+=8
+    ret += " TPC_RADR: " + hex(TPC_RADR) + "\n"
+    n=0
+    TPC_RMSK = 0
+    for val in t[4+tpcc_rasz:4+tpcc_rasz+tpcc_rmsz]:
+        TPC_RMSK |= val << n
+        n+=8
+    ret += " TPC_RMSK: " + hex(TPC_RMSK) + "\n"
+    return ret
 
 knownid = {
         0x01 : CISTPL_DEVICE,
@@ -181,6 +199,7 @@ knownid = {
         0x15 : CISTPL_VERS_1,
         0x21 : CISTPL_FUNCID,
         0x22 : CISTPL_FUNCE,
+        0x1A : CISTPL_CONFIG,
         }
 
 def pprinter(t):
