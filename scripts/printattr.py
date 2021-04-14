@@ -147,10 +147,25 @@ def CISTPL_FUNCE(t):
     def FUNCE_ATA(t):
         ret = " FUNCE_ATA\n"
         return ret
+    def FUNCE_ATA2(t):
+        ret = " FUNCE_ATA2\n"
+        ret += "  V=" + str((t[3]&0x03)>>0) + "\n"
+        ret += "  S=" + str((t[3]&0x04)>>2) + "\n"
+        ret += "  U=" + str((t[3]&0x08)>>3) + "\n"
+        ret += "  D=" + str((t[3]&0x10)>>4) + "\n"
+        ret += "  P0=" + str((t[4]&0x01)>>0) + "\n"
+        ret += "  P1=" + str((t[4]&0x02)>>1) + "\n"
+        ret += "  P2=" + str((t[4]&0x04)>>2) + "\n"
+        ret += "  P3=" + str((t[4]&0x08)>>3) + "\n"
+        ret += "  N=" + str((t[4]&0x10)>>4) + "\n"
+        ret += "  E=" + str((t[4]&0x20)>>5) + "\n"
+        ret += "  I=" + str((t[4]&0x40)>>6) + "\n"
+        return ret
 
     ret = "CISTPL_FUNCE " + str(t) + "\n"
     knownfunc = {
             0x01 : FUNCE_ATA,
+            0x02 : FUNCE_ATA2,
         }
     if t[2] in knownfunc.keys():
         return ret + knownfunc[t[2]](t)
