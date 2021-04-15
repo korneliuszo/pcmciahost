@@ -362,6 +362,7 @@ def CISTPL_CFTABLE_ENTRY(t,pdict):
         TPCE_IO = t[reg]
         reg+=1
         bust = {
+                0 : "Reserved",
                 1 : "8bit only",
                 2 : "16bit only",
                 3 : "8/16bit",
