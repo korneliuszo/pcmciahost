@@ -515,18 +515,35 @@ def pprinter(t,pdict):
     else:
         return str(bytes(t)) + "\n" + str(t)
 
-if __name__ == '__main__':
-    f=open("attr.bin","rb")
-    parseddict = {}  
+def bytes_from_file(filename, chunksize=8192):
+    with open(filename, "rb") as f:
+        while True:
+            chunk = f.read(chunksize)
+            if chunk:
+                for b in chunk:
+                    yield b
+            else:
+                break
+
+def parse_iterator(it):
+    parseddict = {}
+    ret = ""
     while True:
         t=[]
-        t.append(f.read(1)[0])
+        t.append(next(it))
         if t[0]==0xff:
             break
-        l=f.read(1)[0]
+        l=next(it)
         t.append(l)
         for a in range(l):
-            t.append(f.read(1)[0])
-        print(pprinter(t,parseddict))
+            t.append(next(it))
+        ret+=pprinter(t,parseddict)
+    return ret, parseddict
+
+
+if __name__ == '__main__':
+    it=bytes_from_file("attr.bin")
+    ret, parseddict = parse_iterator(it)
+    print(ret)
     import yaml
     print(yaml.dump(parseddict, default_flow_style=False))
