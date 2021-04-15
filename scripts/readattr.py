@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import pcmciaconn
+import sys
 
 p=pcmciaconn.PcmciaConn("/dev/ttyACM0")
 print("sync")
@@ -10,7 +11,7 @@ print("reset")
 p.reset()
 print("read")
 
-f=open("attr.bin","wb")
+f=open(sys.argv[1],"wb")
 addr=0
 while True:
     t=[]

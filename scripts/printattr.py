@@ -542,7 +542,8 @@ def parse_iterator(it):
 
 
 if __name__ == '__main__':
-    it=bytes_from_file("attr.bin")
+    import sys
+    it=bytes_from_file(sys.argv[1])
     ret, parseddict = parse_iterator(it)
     print(ret)
     import yaml
