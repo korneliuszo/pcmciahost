@@ -212,11 +212,31 @@ def CISTPL_FUNCE(t,pdict):
             ret += "  " + key + "=" + str(val) + "\n"
             leaf[key] = val
         return ret
+    def FUNCE_LAN_MEDIA(t,leaf):
+        ret = " FUNCE_LAN_MEDIA\n"
+        leaf["TYPE"] = "LAN"
+        mediadict = {
+                1 : "Unshielded twisted pair",
+                2 : "Shielded twisted pair",
+                3 : "Thin coax",
+                4 : "Thick coax",
+                5 : "Fiber",
+                6 : "Spread spectrum radio 902-928 MHz",
+                7 : "Spread spectrum radio 2.4 GHz",
+                8 : "Spread spectrum radio 5.4 GHz",
+                9 : "Diffuse infra red",
+                10 : "Point to point infra red",
+            }
+        media = mediadict[t[3]]
+        ret += "  MEDIA: " + media + "\n"
+        leaf["MEDIA"] = media
+        return ret
 
     ret = "CISTPL_FUNCE " + str(t) + "\n"
     knownfunc = {
             0x01 : FUNCE_ATA,
             0x02 : FUNCE_ATA2,
+            0x03 : FUNCE_LAN_MEDIA,
         }
     if t[2] in knownfunc.keys():
         leaf = {}
