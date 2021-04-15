@@ -49,11 +49,11 @@ int main(void)
 				tx(PINH);
 				break;
 			case 0x02: //SET_RESET
-				DDRE |= 1<<3;
 				if(rx())
-					PORTE&=~(1<<3); //CBI(RESET)
-				else
 					PORTE|=1<<3; //SBI(RESET)
+				else
+					PORTE&=~(1<<3); //CBI(RESET)
+				DDRE |= 1<<3;
 				break;
 			case 0x03: //GET_ATTR_MEMORY
 				PORTD&=~(1<<2); //SBI(REG)
