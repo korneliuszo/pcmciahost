@@ -506,6 +506,12 @@ def CISTPL_NO_LINK(t,pdict):
     ret = "CISTPL_NO_LINK "  + str(t) + "\n"
     return ret
 
+def CISTPL_VENDOR(t,pdict):
+    ret = "CISTPL_VENDOR "  + str(t) + "\n"
+    pdict.setdefault("VENDOR_"+hex(t[0]),[])
+    pdict["VENDOR_"+hex(t[0])].append(bytes(t[2:]))
+    return ret
+
 knownid = {
         0x01 : CISTPL_DEVICE,
         0x17 : CISTPL_DEVICEA,
@@ -519,6 +525,8 @@ knownid = {
         0x1B : CISTPL_CFTABLE_ENTRY,
         0x14 : CISTPL_NO_LINK,
         }
+for i in range(0x80, 0x90):
+    knownid[i] = CISTPL_VENDOR
 
 def pprinter(t,pdict):
     if t[0] in knownid.keys():
