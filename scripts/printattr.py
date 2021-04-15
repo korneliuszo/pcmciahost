@@ -11,6 +11,15 @@ def CISTPL_DEVICE(t,pdict):
     pdict["DEVICE"]=leaf
     return ret
 
+def CISTPL_DEVICEA(t,pdict):
+    ret = "CISTPL_DEVICEA " + str(t) + "\n"
+    i=2
+    leaf = {}
+    ret += DEVICE_INFO(t[i:],leaf)
+    pdict["DEVICEA"]=leaf
+    return ret
+
+
 def DEVICE_INFO(t,leaf):
     ret = ""
     i = 0
@@ -499,6 +508,7 @@ def CISTPL_NO_LINK(t,pdict):
 
 knownid = {
         0x01 : CISTPL_DEVICE,
+        0x17 : CISTPL_DEVICEA,
         0x1C : CISTPL_DEVICE_OC,
         0x18 : CISTPL_JEDEC_C,
         0x20 : CISTPL_MANFID,
