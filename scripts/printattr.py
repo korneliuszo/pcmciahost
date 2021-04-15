@@ -124,7 +124,7 @@ def CISTPL_JEDEC_C(t,pdict):
 def CISTPL_MANFID(t,pdict):
     pdict.setdefault("MANFID",[])
     ret = "CISTPL_MANFID " + str(t) + "\n"
-    manf,card = struct.unpack("<HH",bytes(t[2:]))
+    manf,card = struct.unpack("<HH",bytes(t[2:6]))
     ret += " MANF: " + hex(manf) + " CARD: " + hex(card) +"\n"
     pdict["MANFID"].append({ "MANF" : manf, "CARD" : card})
     return ret
