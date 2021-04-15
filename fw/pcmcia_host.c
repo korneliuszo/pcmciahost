@@ -25,7 +25,7 @@ int main(void)
 	#else
 	UCSR0A &= ~(1 << U2X0);
 	#endif
-	PORTA = 0x0F; // set 1 on OE,WE,CE1,CE2
+	PORTA = 0xFF; // set 1 on OE,WE,CE1,CE2
 	DDRA = 0x0F;
 	DDRB = 0xFF; //A16-A23
 	DDRC = 0xFF; //A8-A15
@@ -96,6 +96,9 @@ int main(void)
 				break;
 			case 0x05: //PING
 				tx(rx());
+				break;
+			case 0x06: //GET_READY/IREQ
+				tx((PINA&0x10)?1:0);
 				break;
 		}
 	}
