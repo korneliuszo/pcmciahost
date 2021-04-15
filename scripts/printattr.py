@@ -215,7 +215,7 @@ def CISTPL_FUNCE(t,pdict):
         pdict["FUNCE"].append(leaf)
         return ret
     else:
-        return ret + " UNKNOWN"
+        return ret + " UNKNOWN" + "\n"
 
 def CISTPL_CONFIG(t,pdict):
     ret = "CISTPL_CONFIG " + str(t) + "\n"
@@ -514,7 +514,7 @@ def pprinter(t,pdict):
     if t[0] in knownid.keys():
         return knownid[t[0]](t,pdict)
     else:
-        return str(bytes(t)) + "\n" + str(t)
+        return "UNKNOWN\n " + str(bytes(t)) + "\n " + str(t) + "\n"
 
 def bytes_from_file(filename, chunksize=8192):
     with open(filename, "rb") as f:
