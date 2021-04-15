@@ -512,6 +512,20 @@ def CISTPL_VENDOR(t,pdict):
     pdict["VENDOR_"+hex(t[0])].append(bytes(t[2:]))
     return ret
 
+def CISTPL_DATE(t,pdict):
+    ret = "CISTPL_DATETIME "  + str(t) + "\n"
+    import datetime
+    s = t[2]&0x1f
+    m = ((t[2]&0xE0)>>5) + (t[3]&0x07)*10
+    h = (t[3]&0xF8)>>3
+    d = t[4]&0x1F
+    m = ((t[4]&0xE0)>>5) + (t[5]&0x01)*10
+    y = ((t[5]&0xFE)>>1) + 1980
+    date = datetime.datetime(y,m,d,h,m,s)
+    ret += " " + date.isoformat() + "\n"
+    pdict["DATE"] = date
+    return ret
+
 knownid = {
         0x01 : CISTPL_DEVICE,
         0x17 : CISTPL_DEVICEA,
@@ -524,6 +538,7 @@ knownid = {
         0x1A : CISTPL_CONFIG,
         0x1B : CISTPL_CFTABLE_ENTRY,
         0x14 : CISTPL_NO_LINK,
+        0x44 : CISTPL_DATE,
         }
 for i in range(0x80, 0x90):
     knownid[i] = CISTPL_VENDOR
