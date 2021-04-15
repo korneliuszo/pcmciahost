@@ -14,6 +14,9 @@ class PcmciaConn():
 
     def sync(self):
         self.s.write(b"\x00\x00\x00\x00\x00\x00")
+        self.s.flush()
+        time.sleep(0.2)
+        self.s.reset_input_buffer()
     
     def ping(self,val):
         self.s.write(struct.pack(">BB",0x05,val))
