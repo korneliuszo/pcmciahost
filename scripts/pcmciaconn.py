@@ -39,3 +39,9 @@ class PcmciaConn():
     def readattr(self,addr):
         self.s.write(struct.pack(">BL",0x03,addr))
         return self.s.read(1)[0]
+
+    def readattrit(self):
+        addr = 0
+        while True:
+            yield self.readattr(addr)
+            addr +=2

@@ -12,17 +12,16 @@ p.reset()
 print("read")
 
 f=open(sys.argv[1],"wb")
-addr=0
+it = p.readattrit()
 while True:
     t=[]
-    t.append(p.readattr(addr))
+    t.append(next(it))
     if t[0]==0xff:
         f.write(bytes(t))
         break
-    l=p.readattr(addr+2)
+    l=next(it)
     t.append(l)
-    for a in range(addr+4,addr+4+l*2,2):
-        t.append(p.readattr(a))
+    for a in range(l):
+        t.append(next(it))
     f.write(bytes(t))
-    addr+=4+l*2
 
