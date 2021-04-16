@@ -214,7 +214,7 @@ def CISTPL_FUNCE(t,pdict):
         return ret
     def FUNCE_LAN_MEDIA(t,leaf):
         ret = " FUNCE_LAN_MEDIA\n"
-        leaf["TYPE"] = "LAN"
+        leaf["TYPE"] = "LAN_MEDIA"
         mediadict = {
                 1 : "Unshielded twisted pair",
                 2 : "Shielded twisted pair",
@@ -234,15 +234,22 @@ def CISTPL_FUNCE(t,pdict):
 
     ret = "CISTPL_FUNCE " + str(t) + "\n"
     knownfunc = {
-            0x01 : FUNCE_ATA,
-            0x02 : FUNCE_ATA2,
-            0x03 : FUNCE_LAN_MEDIA,
+            "Fixed Disk" : {
+                0x01 : FUNCE_ATA,
+                0x02 : FUNCE_ATA2,
+            },
+            "Network Adapter" : {
+                0x03 : FUNCE_LAN_MEDIA,
+            },
         }
-    if t[2] in knownfunc.keys():
-        leaf = {}
-        ret += knownfunc[t[2]](t,leaf)
-        pdict["FUNCE"].append(leaf)
-        return ret
+    if pdict["FUNCID"]["FUNCTION"] in knownfunc.keys():
+        if t[2] in knownfunc[pdict["FUNCID"]["FUNCTION"]].keys():
+            leaf = {}
+            ret += knownfunc[pdict["FUNCID"]["FUNCTION"]][t[2]](t,leaf)
+            pdict["FUNCE"].append(leaf)
+            return ret
+        else:
+            return ret + " UNKNOWN" + "\n"
     else:
         return ret + " UNKNOWN" + "\n"
 
