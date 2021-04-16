@@ -230,6 +230,14 @@ def CISTPL_FUNCE(t,pdict):
         leaf["TECH"] = tech
         return ret
 
+    def FUNCE_LAN_SPEED(t,leaf):
+        ret = " FUNCE_LAN_SPEED\n"
+        leaf["TYPE"] = "LAN_SPEED"
+        tech = struct.unpack("<L",bytes(t[3:7]))[0]
+        ret += "  SPEED: " + str(tech) + "\n"
+        leaf["SPEED"] = tech
+        return ret
+
     def FUNCE_LAN_MEDIA(t,leaf):
         ret = " FUNCE_LAN_MEDIA\n"
         leaf["TYPE"] = "LAN_MEDIA"
@@ -258,6 +266,7 @@ def CISTPL_FUNCE(t,pdict):
             },
             "Network Adapter" : {
                 0x01 : FUNCE_LAN_TECH,
+                0x02 : FUNCE_LAN_SPEED,
                 0x03 : FUNCE_LAN_MEDIA,
             },
         }
