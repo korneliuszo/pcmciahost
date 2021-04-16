@@ -19,3 +19,5 @@ class FuncConfRegs():
         return property(lambda self : self.getp(offset), lambda self, val : self.setp(offset, val))
 
     CONFIG_OPTION = prop(0)
+    SOCKET_COPY = prop(6)
+
