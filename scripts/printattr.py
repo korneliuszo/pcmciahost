@@ -212,6 +212,24 @@ def CISTPL_FUNCE(t,pdict):
             ret += "  " + key + "=" + str(val) + "\n"
             leaf[key] = val
         return ret
+
+    def FUNCE_LAN_TECH(t,leaf):
+        ret = " FUNCE_LAN_TECH\n"
+        leaf["TYPE"] = "LAN_TECH"
+        techdict = {
+                1 : "Arcnet",
+                2 : "Ethernet",
+                3 : "Token Ring",
+                4 : "Local Talk",
+                5 : "FDDI/CDDI",
+                6 : "ATM",
+                7 : "Wireless",
+            }
+        tech = techdict[t[3]]
+        ret += "  TECH: " + tech + "\n"
+        leaf["TECH"] = tech
+        return ret
+
     def FUNCE_LAN_MEDIA(t,leaf):
         ret = " FUNCE_LAN_MEDIA\n"
         leaf["TYPE"] = "LAN_MEDIA"
@@ -239,6 +257,7 @@ def CISTPL_FUNCE(t,pdict):
                 0x02 : FUNCE_ATA2,
             },
             "Network Adapter" : {
+                0x01 : FUNCE_LAN_TECH,
                 0x03 : FUNCE_LAN_MEDIA,
             },
         }
