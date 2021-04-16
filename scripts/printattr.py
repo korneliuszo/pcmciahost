@@ -258,6 +258,14 @@ def CISTPL_FUNCE(t,pdict):
         leaf["MEDIA"] = media
         return ret
 
+    def FUNCE_LAN_CONN(t,leaf):
+        ret = " FUNCE_LAN_CONN\n"
+        leaf["TYPE"] = "LAN_CONN"
+        conn = "Closed connector standard" if t[3] else "Open connector standard"
+        ret += "  Conn: " + conn + "\n"
+        leaf["CONN"] = conn
+        return ret
+
     ret = "CISTPL_FUNCE " + str(t) + "\n"
     knownfunc = {
             "Fixed Disk" : {
@@ -268,6 +276,7 @@ def CISTPL_FUNCE(t,pdict):
                 0x01 : FUNCE_LAN_TECH,
                 0x02 : FUNCE_LAN_SPEED,
                 0x03 : FUNCE_LAN_MEDIA,
+                0x05 : FUNCE_LAN_CONN,
             },
         }
     if pdict["FUNCID"]["FUNCTION"] in knownfunc.keys():
