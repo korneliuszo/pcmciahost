@@ -33,9 +33,24 @@ class IdeConn():
                     break
             if selconf is not None:
                 break
-        self.fcr.CONFIG_OPTION = selconf
-        print("Config:",self.fcr.CONFIG_OPTION)
+        self.fcr.CONFIG_OPTION = selconf | (1<<6)
+        print("Config:",hex(self.fcr.CONFIG_OPTION))
+        self.DATA = self.prop(0x1f0+0)
+        self.ERROR_FEATURES = self.prop(0x1f0+1)
+        self.SECT_COUNT = self.prop(0x1f0+2)
+        self.SECT_NO = self.prop(0x1f0+3)
+        self.CYL_LO = self.prop(0x1f0+4)
+        self.CYL_HI = self.prop(0x1f0+5)
+        self.SELC_H = self.prop(0x1f0+6)
+        self.STAT_CMD = self.prop(0x1f0+7)
+        self.ALTS_DEVCTRL = self.prop(0x3f6+0)
+        self.DRV_ADDR = self.prop(0x3f6+1)
+
+    def prop(self,addr):
+        return property(lambda self : self.conn.readio(offset), lambda self, val : self.conn.writeio(offset, val))
 
 
 if __name__ == '__main__':
     i = IdeConn("/dev/ttyACM0")
+    i.SECT_NO = 0xAA
+    print("SECT_NO:", hex(i.SECT_NO))

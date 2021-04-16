@@ -100,6 +100,45 @@ int main(void)
 			case 0x06: //GET_READY/IREQ
 				tx((PINA&0x10)?1:0);
 				break;
+			case 0x07: //GET_IO_8
+				PORTD&=~(1<<2); //SBI(REG)
+				PORTD = (PORTD&0xFC) | (rx()&0x03); // A24-A25
+				PORTB = rx(); //A16-A23
+				PORTC = rx(); //A8-A15
+				PORTF = rx(); //A7-A0
+				PORTA &=~(1<<2); //CE1=0
+				PORTA |=1<<3; //CE2=1
+				PORTA |=1<<0; //OE=1
+				asm volatile("nop");
+				asm volatile("nop");
+				PORTD &=~(1<<3); //IORD=0
+				asm volatile("nop");
+				while(!(PINA&(1<<7))); //loop  until !WAIT
+				asm volatile("nop");
+				tx(PINL);
+				PORTD |=(1<<3); //IORD=1
+				break;
+			case 0x08: //SET_IO_8
+				PORTD&=~(1<<2); //SBI(REG)
+				PORTD = (PORTD&0xFC) | (rx()&0x03); // A24-A25
+				PORTB = rx(); //A16-A23
+				PORTC = rx(); //A8-A15
+				PORTF = rx(); //A7-A0
+				PORTA &=~(1<<2); //CE1=0
+				PORTA |=1<<3; //CE2=1
+				PORTA |=1<<0; //OE=1
+				PORTL = rx(); //data
+				DDRL = 0xFF; //enable output
+				asm volatile("nop");
+				asm volatile("nop");
+				PORTD &=~(1<<7); //IOWR=0
+				asm volatile("nop");
+				while(!(PINA&(1<<7))); //loop  until !WAIT
+				asm volatile("nop");
+				PORTD |=(1<<7); //IOWR=1
+				asm volatile("nop");
+				DDRL = 0x00; //disable output
+				break;
 		}
 	}
 	return 0;

@@ -48,3 +48,10 @@ class PcmciaConn():
         while True:
             yield self.readattr(addr)
             addr +=2
+
+    def readio(self,addr):
+        self.s.write(struct.pack(">BL",0x07,addr))
+        return self.s.read(1)[0]
+
+    def writeio(self,addr,data):
+        self.s.write(struct.pack(">BLB",0x08,addr,data))
