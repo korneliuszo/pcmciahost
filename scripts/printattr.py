@@ -130,6 +130,20 @@ def CISTPL_JEDEC_C(t,pdict):
     pdict["JEDEC"] = leaf
     return ret
 
+def CISTPL_JEDEC_A(t,pdict):
+    ret = "CISTPL_DEVICE_JEDEC_A " + str(t) + "\n"
+    i=2
+    leaf=[]
+    for mfg,cid in zip(t[i::2], t[i+1::2]):
+        ret+=" MFG: " + hex(mfg) + " ID: " + hex(cid) + "\n"
+        leaf.append({
+            "MFG" : mfg,
+            "ID" : cid,
+        })
+    pdict["JEDEC_A"] = leaf
+    return ret
+
+
 def CISTPL_MANFID(t,pdict):
     pdict.setdefault("MANFID",[])
     ret = "CISTPL_MANFID " + str(t) + "\n"
@@ -604,6 +618,7 @@ knownid = {
         0x17 : CISTPL_DEVICEA,
         0x1C : CISTPL_DEVICE_OC,
         0x18 : CISTPL_JEDEC_C,
+        0x19 : CISTPL_JEDEC_A,
         0x20 : CISTPL_MANFID,
         0x15 : CISTPL_VERS_1,
         0x21 : CISTPL_FUNCID,
