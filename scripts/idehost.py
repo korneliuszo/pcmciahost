@@ -3,6 +3,7 @@ import pcmciaconn
 import printattr
 import funcconfregs
 from whynotinpython import templatematch
+import time
 
 class IdeConn():
     def __init__(self,port):
@@ -35,22 +36,35 @@ class IdeConn():
                 break
         self.fcr.CONFIG_OPTION = selconf | (1<<6)
         print("Config:",hex(self.fcr.CONFIG_OPTION))
-        self.DATA = self.prop(0x1f0+0)
-        self.ERROR_FEATURES = self.prop(0x1f0+1)
-        self.SECT_COUNT = self.prop(0x1f0+2)
-        self.SECT_NO = self.prop(0x1f0+3)
-        self.CYL_LO = self.prop(0x1f0+4)
-        self.CYL_HI = self.prop(0x1f0+5)
-        self.SELC_H = self.prop(0x1f0+6)
-        self.STAT_CMD = self.prop(0x1f0+7)
-        self.ALTS_DEVCTRL = self.prop(0x3f6+0)
-        self.DRV_ADDR = self.prop(0x3f6+1)
+        self.fcr.SOCKET_COPY = 0
 
-    def prop(self,addr):
-        return property(lambda self : self.conn.readio(offset), lambda self, val : self.conn.writeio(offset, val))
+    def prop(addr):
+        return property(lambda self : self.p.readio(addr), lambda self, val : self.p.writeio(addr, val))
 
+    DATA = prop(0x1f0+0)
+    ERROR_FEATURES = prop(0x1f0+1)
+    SECT_COUNT = prop(0x1f0+2)
+    SECT_NO = prop(0x1f0+3)
+    CYL_LO = prop(0x1f0+4)
+    CYL_HI = prop(0x1f0+5)
+    SELC_H = prop(0x1f0+6)
+    STAT_CMD = prop(0x1f0+7)
+    ALTS_DEVCTRL = prop(0x3f6+0)
+    DRV_ADDR = prop(0x3f6+1)
+
+class IdeHigh():
+    def __init__(self,port):
+        self.i = IdeConn(port)
+        self.i.ALTS_DEVCTRL = 4
+        time.sleep(0.000005)
+        self.i.ALTS_DEVCTRL = 0
+        self.busypoll()
+
+    def busypoll(self):
+        time.sleep(0.0000004)
+        while self.i.ALTS_DEVCTRL & 0xc0 != 0x40:
+            pass
 
 if __name__ == '__main__':
-    i = IdeConn("/dev/ttyACM0")
-    i.SECT_NO = 0xAA
-    print("SECT_NO:", hex(i.SECT_NO))
+    i = IdeHigh("/dev/ttyACM0")
+
