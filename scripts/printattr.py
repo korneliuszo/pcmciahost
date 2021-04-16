@@ -613,6 +613,17 @@ def CISTPL_DATE(t,pdict):
     pdict["DATE"] = date
     return ret
 
+def CISTPL_CHECKSUM(t,pdict):
+    ret = "CISTPL_CHECKSUM "  + str(t) + "\n"
+    addr, length, checksum = struct.unpack("<hHB",bytes(t[2:7]))
+    ret += " Addr: " + str(addr) + " Len: " + str(length) + " Checksum: " + str(checksum) + "\n"
+    pdict["CHECKSUM"] = {}
+    pdict["CHECKSUM"]["ADDR"] = addr
+    pdict["CHECKSUM"]["LEN"] = length
+    pdict["CHECKSUM"]["CHECKSUM"] = checksum
+    return ret
+
+
 knownid = {
         0x01 : CISTPL_DEVICE,
         0x17 : CISTPL_DEVICEA,
@@ -627,6 +638,7 @@ knownid = {
         0x1B : CISTPL_CFTABLE_ENTRY,
         0x14 : CISTPL_NO_LINK,
         0x44 : CISTPL_DATE,
+        0x10 : CISTPL_CHECKSUM,
         }
 for i in range(0x80, 0x90):
     knownid[i] = CISTPL_VENDOR
