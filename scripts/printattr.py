@@ -258,6 +258,14 @@ def CISTPL_FUNCE(t,pdict):
         leaf["MEDIA"] = media
         return ret
 
+    def FUNCE_LAN_NID(t,leaf):
+        ret = " FUNCE_LAN_NID\n"
+        leaf["TYPE"] = "LAN_NID"
+        nid = ':'.join('%02x' % b for b in t[4:4+t[3]])
+        ret += "  NID: " + nid + "\n"
+        leaf["NID"] =nid
+        return ret
+
     def FUNCE_LAN_CONN(t,leaf):
         ret = " FUNCE_LAN_CONN\n"
         leaf["TYPE"] = "LAN_CONN"
@@ -276,6 +284,7 @@ def CISTPL_FUNCE(t,pdict):
                 0x01 : FUNCE_LAN_TECH,
                 0x02 : FUNCE_LAN_SPEED,
                 0x03 : FUNCE_LAN_MEDIA,
+                0x04 : FUNCE_LAN_NID,
                 0x05 : FUNCE_LAN_CONN,
             },
         }
