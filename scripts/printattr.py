@@ -295,6 +295,29 @@ def CISTPL_FUNCE(t,pdict):
         leaf["CONN"] = conn
         return ret
 
+    def FUNCE_SIO_USB(t, leaf):      
+        ret = " FUNCE_SIO)USB\n"
+        leaf["TYPE"] = "SIO_USB"
+        typed = {
+            0x00 : "USB/OHCI",
+            0x01 : "USB/Universal",
+            0x02 : "NHCI"
+            }
+        ret += "  TYPE: " + typed[t[3]] + "\n"
+        leaf["TYPE"] = typed[t[3]]
+        powerd = {
+            0x00 : "Self Powered",
+            0x01 : "Bus Powered",
+            0x02 : "100mA",
+            0x03 : "500mA",
+            }
+        ret += "  POWER: " + powerd[t[4]] + "\n"
+        leaf["POWER"] = powerd[t[4]]
+        speed = struct.unpack("<H",bytes(t[5:7]))[0]
+        ret += "  SPEED: " + str(speed) + "\n"
+        leaf["SPEED"] = speed
+        return ret
+
     ret = "CISTPL_FUNCE " + str(t) + "\n"
     knownfunc = {
             "Fixed Disk" : {
@@ -308,6 +331,9 @@ def CISTPL_FUNCE(t,pdict):
                 0x04 : FUNCE_LAN_NID,
                 0x05 : FUNCE_LAN_CONN,
             },
+            "Serial I/O Bus Adapter" : {
+                0x02 : FUNCE_SIO_USB,
+            }
         }
     if pdict["FUNCID"]["FUNCTION"] in knownfunc.keys():
         if t[2] in knownfunc[pdict["FUNCID"]["FUNCTION"]].keys():
